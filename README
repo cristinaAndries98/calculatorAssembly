@@ -1,0 +1,25 @@
+	In ceea ce priveste implementarea temei, am pornit de la ideea din C cu evaluarea expresiilor postfixate conform careia citesti numerele, pe masura ce le citesti le pui in stiva. Cum ai dat de un operator, scoti din stiva ultimele doua valori, faci operatia propriu-zisa cu ele si dupa pui rezultatul la loc in stiva. 
+	In cadrul temei:
+- am citit stringul si am intampinat problema " Cum il parcurg ? ". Jumatatate din tema am folosit lodsb ca sa parcurg caracter cu caracter, dar cand am ajuns la numere negative si de mai multe cifre, nu am reusit sa ma mai folosesc de lodsb ( ca si contor aveam lungimea stringului pe care o puneam in ecx ). 
+- am schimbat metoda de parcurgere in byte[expr + ecx], care se opreste atunci cand ajunge la null, terminatorul de sir. 
+- deci, parcurg caracter cu caracter, si prima oara caut operatorii ( +, - , /, *). Daca gasesesc vreunul, ma duc la labelul propriu zis care face operatia. 
+- compar cu null sa vad daca nu cumva e finalul stringului
+- altfel, inseamna ca am dat de o cifra. Aici pun cifra in al, si este vorba despre al, nu eax sau ah, pentru ca iau byte[expr+ecx], scad 48 ( codul ascii), si pun pe striva. Apoi, verific daca am spatiu dupa cifra asta, pentru ca daca nu am spatiu, inseamna ca numarul are doua cifre. 
+
+- dupa cum am zis si in comentarii, am pus labelurile de doua_cifre, trei_cifre, etc doar pentru claritate, sa se inteleaga ca acum tratez cazurile acelea
+- pentru doua cifre: fac pop primei cifre, o inmultesc cu 10 si adun cifra imediat urmatoare. Pun in stiva numarul de doua cifre
+- pentru trei cifre: fac pop numarului de doua cifre, il inmultesc cu 10 si adun cifra a treia. 
+
+- operatiile de adunare, inmultire si impartire sunt similare: fac pop la ultimele doua valori si operez cu ele. 
+
+- scaderea insa a pus probleme pentru ca au existat doua cazuri : 
+	1) o scadere simpla, obisnuita
+	Daca dupa minus urma spatiu, ma duceam si faceam diferenta obisnuita
+	Daca dupa minus urma null, ma duceam la finalul programului
+	2) dupa minus urma o cifra
+	Moment in care trebuie sa formez numarul negativ: iau cifra, scad codul ascii, o neg si apoi o pun in stiva. Pentru numerele de doua si trei cifre, algoritmul este unul analog nr pozitive de doua sau trei cifre. Singura diferenta consta in faptul ca neg cifra pe care o adun, adica o inmultesc cu minus 1, ca sa dea numarul dorit. 
+
+- daca intalnesc spatiu, inseamna ca nu fac nimic, doar parcurg in continuare
+
+Dificultatea in care a constat tema a fost, dupa parerea mea, cum sa parcurg expresia, pentru ca pana am inteles cum sa folosesc lodsb si sa il fac sa mearga, am realizat ca nu e bine ca nu reusesc mai departe sa fac cu el numere de mai multe cifre, asa ca pur si simplu l-am folosit pe ECX ca si contor. O alta dificultate a fost sa reusesc sa formez numerele negative pentru ca, daca aveam, de exemplu : -1 4 -, programul meu lua -, vedea ca e cifra dupa el, facea -1, punea pe stiva, dupa trecea la 1, punea pe stiva, si in final avea -1 1 4 pe stiva si cand dublu incrementam ecx dadea eroare. Problema era, evident, de la parcugerea expresiei, moment in care am renuntat la lodsb. 
+
